@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AgriDoctor - Plant Disease Detection</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: white;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1b5e20, #43a047);
+            color: white;
+            text-align: center;
+            padding: 35px 20px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 17px;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .upload-box {
+            border: 2px dashed #43a047;
+            border-radius: 15px;
+            padding: 35px;
+            text-align: center;
+            background: #f5fff6;
+        }
+
+        .upload-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        .upload-box h2 {
+            color: #1b5e20;
+            margin-bottom: 10px;
+        }
+
+        .upload-box p {
+            color: #666;
+            margin-bottom: 22px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .detect-btn {
+            width: 100%;
+            margin-top: 22px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #1b5e20, #43a047);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .detect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px rgba(27, 94, 32, 0.3);
+        }
+
+        .result-box {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            background: #e8f5e9;
+            border-left: 7px solid #2e7d32;
+        }
+
+        .result-box h2 {
+            color: #1b5e20;
+            margin-bottom: 15px;
+        }
+
+        .result-text {
+            color: #222;
+            font-size: 17px;
+            line-height: 1.8;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 18px;
+            background: #f2f7f2;
+            color: #555;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .upload-box {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>🌿 AgriDoctor</h1>
+            <p>AI-Based Plant Disease Detection System</p>
+        </div>
+
+        <div class="content">
+
+            <form method="POST" enctype="multipart/form-data">
+
+                <div class="upload-box">
+
+                    <div class="upload-icon">🍃</div>
+
+                    <h2>Upload Plant Leaf Image</h2>
+
+                    <p>
+                        Select a clear image of the plant leaf.
+                        Our AI model will detect the disease.
+                    </p>
+
+                    <input
+                        type="file"
+                        name="image"
+                        accept="image/*"
+                        required
+                    >
+
+                    <button type="submit" class="detect-btn">
+                        🔍 Detect Disease
+                    </button>
+
+                </div>
+
+            </form>
+
+            {% if result %}
+
+            <div class="result-box">
+
+                <h2>🌱 Detection Result</h2>
+
+                <div class="result-text">
+                    {{ result }}
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        <div class="footer">
+            © 2026 AgriDoctor | AI Plant Disease Detection
+        </div>
+
+    </div>
+
+</body>
+</html>
