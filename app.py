@@ -1,16 +1,27 @@
 import os
 import numpy as np
-import tensorflow as tf
 from flask import Flask, render_template, request
-from tensorflow.keras.preprocessing import image
+from PIL import Image
+from tensorflow.lite.python.interpreter import Interpreter
 
 app = Flask(__name__)
 
-# Load trained AI model
-model = tf.keras.models.load_model("plant_disease_model.keras")
+# Load lightweight TFLite AI model
+interpreter = Interpreter(
+    model_path="plant_disease_model.tflite"
+)
+
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # Class names
-class_names = ["early_blight", "healthy", "leaf_spot"]
+class_names = [
+    "early_blight",
+    "healthy",
+    "leaf_spot"
+]
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -22,47 +33,78 @@ def home():
 
         if uploaded_image and uploaded_image.filename != "":
 
-            # Open uploaded image using Pillow
+            # Open image
             img = Image.open(uploaded_image.stream)
 
-            # Convert image to RGB
+            # Convert to RGB
             img = img.convert("RGB")
 
             # Resize image
             img = img.resize((224, 224))
 
-            # Convert image to array
-            img_array = np.array(img)
-
-            # Add batch dimension
-            img_array = np.expand_dims(img_array, axis=0)
+            # Convert image to NumPy array
+            img_array = np.array(
+                img,
+                dtype=np.float32
+            )
 
             # Normalize image
             img_array = img_array / 255.0
 
-            # AI prediction
-            prediction = model.predict(img_array)
+            # Add batch dimension
+            img_array = np.expand_dims(
+                img_array,
+                axis=0
+            )
 
-            predicted_index = np.argmax(prediction[0])
+            # Give image to AI model
+            interpreter.set_tensor(
+                input_details[0]["index"],
+                img_array
+            )
 
-            disease = class_names[predicted_index]
+            # Run prediction
+            interpreter.invoke()
+
+            # Get prediction
+            prediction = interpreter.get_tensor(
+                output_details[0]["index"]
+            )
+
+            predicted_index = int(
+                np.argmax(prediction[0])
+            )
+
+            disease = class_names[
+                predicted_index
+            ]
 
             confidence = float(
                 np.max(prediction[0]) * 100
             )
 
             recommendations = {
-    "early_blight": "Remove infected leaves and use a suitable fungicide.",
-    "healthy": "The plant is healthy. Continue regular watering and care.",
-    "leaf_spot": "Remove affected leaves and use a suitable fungicide."
-        }
+                "early_blight":
+                    "Remove infected leaves and use a suitable fungicide.",
 
-            recommendation = recommendations[disease]
+                "healthy":
+                    "The plant is healthy. Continue regular watering and care.",
+
+                "leaf_spot":
+                    "Remove affected leaves and use a suitable fungicide."
+            }
+
+            recommendation = recommendations[
+                disease
+            ]
 
             result = (
-            f"Disease: {disease.replace('_', ' ').title()} | "
-            f"Confidence: {confidence:.2f}% | "
-            f"Recommendation: {recommendation}"
+                f"Disease: "
+                f"{disease.replace('_', ' ').title()} | "
+                f"Confidence: "
+                f"{confidence:.2f}% | "
+                f"Recommendation: "
+                f"{recommendation}"
             )
 
         else:
@@ -75,4 +117,12 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(
+        host="0.0.0.0",
+        port=int(
+            os.environ.get(
+                "PORT",
+                5000
+            )
+        )
+    )
