@@ -4,9 +4,6 @@ from flask import Flask, render_template, request
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
 
-app = Flask(__name__)
-
-# Load lightweight TFLite AI model
 interpreter = Interpreter(
     model_path="plant_disease_model.tflite"
 )
