@@ -3,210 +3,683 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AgriDoctor - Plant Disease Detection</title>
+    <title>AgriDoctor - AI Plant Disease Detection & Advisory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #047857;
+            --primary-light: #d1fae5;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #022c22 100%);
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius-lg: 20px;
+            --shadow-glow: 0 20px 40px -15px rgba(16, 185, 129, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            padding: 30px 15px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            padding: 25px;
         }
 
-        .container {
+        .main-wrapper {
             width: 100%;
-            max-width: 850px;
-            background: white;
-            border-radius: 22px;
-            overflow: hidden;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+            max-width: 1000px;
         }
 
-        .header {
-            background: linear-gradient(135deg, #1b5e20, #43a047);
-            color: white;
+        /* Top Header */
+        .app-header {
             text-align: center;
-            padding: 35px 20px;
+            margin-bottom: 30px;
+            color: white;
         }
 
-        .header h1 {
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            backdrop-filter: blur(10px);
+            padding: 6px 16px;
+            border-radius: 50px;
+            color: #34d399;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .brand-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #34d399;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .app-header h1 {
             font-size: 42px;
-            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #ffffff, #a7f3d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .header p {
-            font-size: 17px;
-            opacity: 0.95;
+        .app-header p {
+            color: #94a3b8;
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .content {
-            padding: 40px;
+        /* Card Container */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin-bottom: 25px;
         }
 
-        .upload-box {
-            border: 2px dashed #43a047;
-            border-radius: 15px;
+        .card-body {
             padding: 35px;
+        }
+
+        /* Upload Dropzone */
+        .upload-section {
             text-align: center;
-            background: #f5fff6;
         }
 
-        .upload-icon {
-            font-size: 55px;
-            margin-bottom: 15px;
-        }
-
-        .upload-box h2 {
-            color: #1b5e20;
-            margin-bottom: 10px;
-        }
-
-        .upload-box p {
-            color: #666;
-            margin-bottom: 22px;
-        }
-
-        input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #bbb;
-            border-radius: 8px;
-            background: white;
+        .drop-zone {
+            border: 2px dashed #a7f3d0;
+            background: #f0fdf4;
+            border-radius: 16px;
+            padding: 40px 20px;
             cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
-        .detect-btn {
-            width: 100%;
-            margin-top: 22px;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #1b5e20, #43a047);
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .detect-btn:hover {
+        .drop-zone:hover, .drop-zone.dragover {
+            background: #dcfce7;
+            border-color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 7px 18px rgba(27, 94, 32, 0.3);
         }
 
-        .result-box {
-            margin-top: 30px;
-            padding: 25px;
-            border-radius: 15px;
-            background: #e8f5e9;
-            border-left: 7px solid #2e7d32;
+        .drop-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+            font-size: 32px;
         }
 
-        .result-box h2 {
-            color: #1b5e20;
-            margin-bottom: 15px;
+        .drop-zone h3 {
+            font-size: 20px;
+            color: #065f46;
+            margin-bottom: 6px;
+            font-weight: 600;
         }
 
-        .result-text {
-            color: #222;
-            font-size: 17px;
-            line-height: 1.8;
+        .drop-zone p {
+            color: #047857;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn-select {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+
+        .btn-select:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Image Preview Box */
+        .preview-container {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .preview-img {
+            max-height: 240px;
+            max-width: 100%;
+            border-radius: 12px;
+            border: 3px solid var(--primary);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .preview-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
             font-weight: 500;
         }
 
-        .footer {
-            text-align: center;
-            padding: 18px;
-            background: #f2f7f2;
-            color: #555;
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            margin-top: 25px;
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-glow);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 32px;
-            }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px -5px rgba(16, 185, 129, 0.5);
+        }
 
-            .content {
-                padding: 20px;
-            }
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
-            .upload-box {
-                padding: 25px 15px;
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Alert message */
+        .alert-error {
+            background: #fef2f2;
+            border-left: 5px solid #ef4444;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        /* Results Layout */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
             }
+        }
+
+        .result-image-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .result-image-card img {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .result-info-card h2 {
+            font-size: 24px;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .confidence-box {
+            margin: 15px 0 20px 0;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .confidence-bar-bg {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+        }
+
+        .section-desc {
+            font-size: 15px;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Accordion / Info Cards */
+        .info-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .info-box h4 {
+            font-size: 15px;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            position: relative;
+            padding-left: 20px;
+            font-size: 14px;
+            color: #334155;
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+
+        .info-box li::before {
+            content: "•";
+            position: absolute;
+            left: 5px;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Class Breakdown Table */
+        .class-scores {
+            margin-top: 25px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .class-scores h4 {
+            font-size: 15px;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .score-item {
+            margin-bottom: 10px;
+        }
+
+        .score-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .score-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: var(--text-muted);
+        }
+
+        .score-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: #10b981;
+        }
+
+        /* Re-upload button */
+        .btn-reset {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #e2e8f0;
+            color: #334155;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-reset:hover {
+            background: #cbd5e1;
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: auto;
+            padding-top: 15px;
+        }
+
+        .app-footer span {
+            color: #34d399;
+            font-weight: 600;
         }
     </style>
 </head>
-
 <body>
 
-    <div class="container">
+    <div class="main-wrapper">
 
-        <div class="header">
+        <!-- Top Header -->
+        <header class="app-header">
+            <div class="brand-badge">
+                <span class="dot"></span> AI Deep Learning Diagnostic System
+            </div>
             <h1>🌿 AgriDoctor</h1>
-            <p>AI-Based Plant Disease Detection System</p>
-        </div>
+            <p>Upload a plant leaf image for instant disease identification, severity analysis & treatment recommendation.</p>
+        </header>
 
-        <div class="content">
+        <!-- Main Card Container -->
+        <main class="glass-card">
+            <div class="card-body">
 
-            <form method="POST" enctype="multipart/form-data">
-
-                <div class="upload-box">
-
-                    <div class="upload-icon">🍃</div>
-
-                    <h2>Upload Plant Leaf Image</h2>
-
-                    <p>
-                        Select a clear image of the plant leaf.
-                        Our AI model will detect the disease.
-                    </p>
-
-                    <input
-                        type="file"
-                        name="image"
-                        accept="image/*"
-                        required
-                    >
-
-                    <button type="submit" class="detect-btn">
-                        🔍 Detect Disease
-                    </button>
-
+                {% if error_msg %}
+                <div class="alert-error">
+                    ⚠️ {{ error_msg }}
                 </div>
+                {% endif %}
 
-            </form>
+                {% if not data %}
+                <!-- Upload Form -->
+                <section class="upload-section">
+                    <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                        <div class="drop-zone" id="dropZone">
+                            <div class="drop-icon">🍃</div>
+                            <h3>Select or Drag Plant Leaf Image</h3>
+                            <p>Supports JPG, PNG, WEBP formats (Max 10MB)</p>
+                            <span class="btn-select">Browse Image</span>
+                            <input type="file" name="image" id="fileInput" class="file-input" accept="image/*" required>
+                        </div>
 
-            {% if result %}
+                        <div class="preview-container" id="previewContainer">
+                            <img id="previewImage" class="preview-img" src="" alt="Selected Leaf Preview">
+                            <div id="previewName" class="preview-name"></div>
+                        </div>
 
-            <div class="result-box">
+                        <button type="submit" id="submitBtn" class="btn-submit">
+                            <span class="spinner" id="spinner"></span>
+                            <span id="btnText">🔍 Analyze Leaf & Detect Disease</span>
+                        </button>
+                    </form>
+                </section>
 
-                <h2>🌱 Detection Result</h2>
+                {% else %}
 
-                <div class="result-text">
-                    {{ result }}
-                </div>
+                <!-- Diagnosis Results View -->
+                <section class="results-section">
+                    <div class="results-grid">
+
+                        <!-- Left Column: Uploaded Image & Prediction Badge -->
+                        <div class="result-image-card">
+                            <img src="data:image/jpeg;base64,{{ data.image_b64 }}" alt="Analyzed Plant Leaf">
+                            <span class="badge {{ data.info.badge_class }}">
+                                Status: {{ data.info.severity }}
+                            </span>
+
+                            <div class="confidence-box">
+                                <div class="confidence-label">
+                                    <span>AI Confidence Score</span>
+                                    <span>{{ data.confidence }}%</span>
+                                </div>
+                                <div class="confidence-bar-bg">
+                                    <div class="confidence-bar-fill" style="width: {{ data.confidence }}%;"></div>
+                                </div>
+                            </div>
+
+                            <a href="/" class="btn-reset">🔄 Analyze Another Leaf</a>
+                        </div>
+
+                        <!-- Right Column: Disease Details & Remedies -->
+                        <div class="result-info-card">
+                            <h2>{{ data.info.name }}</h2>
+                            <p class="section-desc">{{ data.info.description }}</p>
+
+                            <div class="info-grid">
+
+                                <div class="info-box">
+                                    <h4>📋 Key Symptoms</h4>
+                                    <ul>
+                                        {% for symptom in data.info.symptoms %}
+                                        <li>{{ symptom }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+                                <div class="info-box">
+                                    <h4>🌱 Organic & Biological Remedies</h4>
+                                    <ul>
+                                        {% for remedy in data.info.organic_remedy %}
+                                        <li>{{ remedy }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+                                <div class="info-box">
+                                    <h4>💊 Recommended Chemical Spray / Care</h4>
+                                    <ul>
+                                        {% for remedy in data.info.chemical_remedy %}
+                                        <li>{{ remedy }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+                                <div class="info-box">
+                                    <h4>🛡️ Preventive Practices</h4>
+                                    <ul>
+                                        {% for prev in data.info.prevention %}
+                                        <li>{{ prev }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+                            </div>
+
+                            <!-- Neural Net Class Probabilities -->
+                            <div class="class-scores">
+                                <h4>📊 Neural Network Output Distribution</h4>
+                                {% for item in data.all_scores %}
+                                <div class="score-item">
+                                    <div class="score-info">
+                                        <span>{{ item.name }}</span>
+                                        <span>{{ item.score }}%</span>
+                                    </div>
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width: {{ item.score }}%;"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                        </div>
+
+                    </div>
+                </section>
+                {% endif %}
 
             </div>
+        </main>
 
-            {% endif %}
-
-        </div>
-
-        <div class="footer">
-            © 2026 AgriDoctor | AI Plant Disease Detection
-        </div>
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© 2026 <span>AgriDoctor AI</span> • Intelligent Plant Healthcare & Precision Farming Project</p>
+        </footer>
 
     </div>
 
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const previewName = document.getElementById('previewName');
+        const uploadForm = document.getElementById('uploadForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btnText');
+
+        if (dropZone && fileInput) {
+            dropZone.addEventListener('click', () => fileInput.click());
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            ['dragleave', 'dragend'].forEach(type => {
+                dropZone.addEventListener(type, () => dropZone.classList.remove('dragover'));
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileChange();
+                }
+            });
+
+            fileInput.addEventListener('change', handleFileChange);
+        }
+
+        function handleFileChange() {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewName.textContent = "📄 Selected: " + file.name;
+                    previewContainer.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', () => {
+                submitBtn.disabled = true;
+                spinner.style.display = 'inline-block';
+                btnText.textContent = 'Analyzing Leaf via Neural Network...';
+            });
+        }
+    </script>
 </body>
 </html>

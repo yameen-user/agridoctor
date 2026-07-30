@@ -1,3 +1,7 @@
 venv/
 __pycache__/
 *.pyc
+dataset/
+dataset_new/
+PlantVillage/
+plant_disease_model.keras
