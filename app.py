@@ -6,13 +6,13 @@ from flask import Flask, render_template, request
 from PIL import Image
 
 try:
-    from tensorflow.lite.python.interpreter import Interpreter
-except ImportError:
+    import tensorflow as tf
+    Interpreter = tf.lite.Interpreter
+except Exception:
     try:
-        import tflite_runtime.interpreter as Interpreter
-    except ImportError:
-        import tensorflow as tf
-        Interpreter = tf.lite.Interpreter
+        from tflite_runtime.interpreter import Interpreter
+    except Exception:
+        from tensorflow.lite.python.interpreter import Interpreter
 
 app = Flask(__name__)
 
